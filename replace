@@ -1,0 +1,3 @@
+#!/bin/bash
+sed '/#Julian#/ r julian.md' index.html > indexFull.html
+sed -i '1s/^/<--! AUTOGENERATE! DO NOT EDIT! -->\n/' indexFull.html
