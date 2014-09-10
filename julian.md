@@ -2,8 +2,11 @@
 # Overview
 
 - Contracts
+    * Soft Contract Verification, P. Nguyên et al.
 - Deep and shallow DSL embeddings
+    * Folding Domain-Specific Languages, J. Gibbons and N. Wu
 - Reflection without remorse
+    * Reflection Without Remorse, A. van der Ploeg and O. Kiselyov
 
    
 ---
@@ -294,11 +297,46 @@ Must prove:
 - `f` is called with `x: even?` - DONE
 
 ---
+template: proof
 
+Can assume:
+- `(f : even? -> even?)`
+- `((+ n 1) : even?)`
+
+---
+template: proof
+
+Can assume:
+- `(f (+ n 1) : even?)`
+
+---
+template: proof
+
+Can assume:
+- `(f (+ n 1) : even?)`
+- `(- : {even?} 1) -> odd?`
+
+---
+template: proof
+
+Can assume:
+- `(- (f (+ n 1)) 1) : odd?)`
+
+---
+template: proof
+
+Can assume:
+- `(- (f (+ n 1)) 1) : odd?)`
+
+DONE
+
+---
+name: deep-and-shallow
 # Deep and Shallow Embeddings
 
 
-Two options
+---
+template: deep-and-shallow
 
 ## Deep
 
@@ -326,15 +364,35 @@ evalS = id
 ```
         
 ---
+template: deep-and-shallow
 
 Deep and shallow embeddings as duals:
 
+--
+
 - Lit and Add do none of the work, evalD all of it.
+
+--
+
 - lit and add do all of the work, evalS is just id.
+
+--
+
 - Easy to add other 'evaluators' to deep (such as pretty-printing).
+
+--
+
 - Hard to do the same for shallow.
+
+--
+
 - Hard to add another construct to deep.
+
+--
+
 - Easy to do the same for shallow.
+
+--
 
 The expression problem. 
 
