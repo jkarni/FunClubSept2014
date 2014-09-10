@@ -130,38 +130,76 @@ template: contract-demo
         ^--- (true)
 
 ---
-
 template: contract-demo
   
                  |    |
       succ x     |    | 
                  |    | 
-        ^--- (true)   carry on
+        ^--- (true)   CARRY ON
 
 ---
+name:static-checking
 
 ## Static checking
 
-```racket
-(lambda ([pos? -> pos?]
-    (- ([pos? -> pos?] (- x))))
-```
 
-'x' must be negative, or the context is to blame.
+---
+template: static-checking
 
 ```racket
-(lambda ([pos? -> pos?]
-    (- ([pos? -> pos?] (- [neg?]))))
-```
-Fact: ```(- x) => [neg? -> pos?]```
-
-```racket
-(lambda ([pos? -> pos?]
-    (- ([pos? -> pos?] ([neg?]))))
+(f : pos? -> neg?) ;; contract
+(define (f x)
+    (* x -1))
 ```
 ---
+template: static-checking
+
+```racket
+(f : pos? -> neg?) ;; contract
+(* x -1))
+```
+
+---
+template: static-checking
+
+```racket
+(f : pos? -> neg?) ;; contract
+(* x -1))
+```
+'x' can be assumed to be positive
+
+---
+template: static-checking
+
+```racket
+(f : pos? -> neg?) ;; contract
+(* {pos} -1))
+```
+
+---
+template: static-checking
+
+```racket
+(f : pos? -> neg?) ;; contract
+(* {pos} -1))
+```
+Fact: `* -1` {pos} -> {neg}
+
+---
+template: static-checking
+
+```racket
+(f : pos? -> neg?) ;; contract
+({neg})
+```
+
+---
+name: higher-order
 
 But what about higher-orders? 
+
+---
+template: higher-order
 
 ```racket
 (e2o : (even? -> even?) -> (odd? -> odd?)
@@ -173,16 +211,87 @@ But what about higher-orders?
 
 > The key insight is that contracts delay higher-order checks and failures
 > always occur with a first order witness.
+ 
+  
+--
 
 Just keep the boundary checking inside the higher-order function.
 
 ---
-
+name: proof
 ```racket
 (e2o : (even? -> even?) -> (odd? -> odd?)
 (define (e2o f)
  (lambda (n) (- (f (+ n 1)) 1)))
 ```
+---
+template: proof
+
+Can assume:
+- `(f : even? -> even?)`
+
+---
+template: proof
+
+Can assume:
+- `(f : even? -> even?)`
+
+
+Must prove:
+- `f` is called with `x: even?`
+
+---
+template: proof
+
+Can assume:
+- `(f : even? -> even?)`
+
+
+
+Must prove:
+- `f` is called with `x: even?`
+
+---
+template: proof
+
+Can assume:
+- `(f : even? -> even?)`
+- `(n : odd?)`
+
+
+Must prove:
+- `f` is called with `x: even?`
+
+---
+template: proof
+
+Can assume:
+- `(f : even? -> even?)`
+- `(n : odd?)`
+- `(+ : {odd?} 1) -> {even?}` 
+
+Must prove:
+- `f` is called with `x: even?`
+
+---
+template: proof
+
+Can assume:
+- `(f : even? -> even?)`
+- `((+ n 1) : even?)`
+
+Must prove:
+- `f` is called with `x: even?`
+
+---
+template: proof
+
+Can assume:
+- `(f : even? -> even?)`
+- `((+ n 1) : even?)`
+
+Must prove:
+- `f` is called with `x: even?` - DONE
 
 ---
 
