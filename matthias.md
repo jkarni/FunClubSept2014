@@ -150,12 +150,34 @@ Guarantees:
 ---
 
 # ghcjs
---
+
+---
 
 ## The ICFP programming contest
 
-(screenshot of lambdabot simulator)
-[also link]
+![Default-aligned image](fig0-lambdaman.png)
+
+---
+
+## The ICFP programming contest
+
+![Default-aligned image](fig1-lambdaman.png)
+
+---
+
+## The ICFP programming contest
+
+![Default-aligned image](fig2-lambdaman.png)
+
+http://icfpcontest.org/
+
+http://icfpcontest.org/game.html
+
+---
+
+## The ICFP programming contest
+
+- ...
 
 ---
 
