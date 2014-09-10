@@ -6,20 +6,159 @@
 - Reflection without remorse
 
    
---- 
-   
+---
+name: contract-demo
+layout: false
  
 # Contracts
 
-
-First-order:
 
 ```racket
 (succ : pos? -> pos?) ;; contract
 (define (succ x)
     (+ x 1))
 ```
+--
+                 |    |
+      succ       |    |      x
+                 |    | 
 
+---
+template: contract-demo
+
+                 |    |
+      succ       |    |  <-  x
+                 |    | 
+
+---
+template: contract-demo
+ 
+                 |    |
+      succ       | x  | 
+                 |    | 
+
+---
+template: contract-demo
+  
+                 |    |
+      succ       | x  | 
+                 |    | 
+                   ^---- (pos? x)
+
+---
+template: contract-demo
+  
+                 |    |
+      succ       | x  | 
+                 |    | 
+                   ^---- (false)
+
+---
+template: contract-demo
+  
+                 |    |
+      succ       | x  | 
+                 |    | 
+                   ^---- (false) BLAME CONTEXT
+
+---
+template: contract-demo
+  
+                 |    |
+      succ       | x  | 
+                 |    | 
+                   ^---- (pos? x)
+                   
+---
+template: contract-demo
+  
+                 |    |
+      succ       | x  | 
+                 |    | 
+                   ^---- (true)
+---
+template: contract-demo
+  
+                 |    |
+      succ     x |    | 
+                 |    | 
+ 
+---
+template: contract-demo
+  
+                 |    |
+      succ x     |    | 
+                 |    | 
+
+---
+template: contract-demo
+  
+                 |    |
+      succ x     |    | 
+                 |    | 
+        ^--- (pos? (succ x))
+
+---
+template: contract-demo
+  
+                 |    |
+      succ x     |    | 
+                 |    | 
+        ^--- (false)
+
+---
+template: contract-demo
+  
+                 |    |
+      succ x     |    | 
+                 |    | 
+        ^--- (false)   BLAME succ
+---
+template: contract-demo
+  
+                 |    |
+      succ x     |    | 
+                 |    | 
+        ^--- (pos? (succ x))
+
+---
+template: contract-demo
+  
+                 |    |
+      succ x     |    | 
+                 |    | 
+        ^--- (true)
+
+---
+
+template: contract-demo
+  
+                 |    |
+      succ x     |    | 
+                 |    | 
+        ^--- (true)   carry on
+
+---
+
+## Static checking
+
+```racket
+(lambda ([pos? -> pos?]
+    (- ([pos? -> pos?] (- x))))
+```
+
+'x' must be negative, or the context is to blame.
+
+```racket
+(lambda ([pos? -> pos?]
+    (- ([pos? -> pos?] (- [neg?]))))
+```
+Fact: ```(- x) => [neg? -> pos?]```
+
+```racket
+(lambda ([pos? -> pos?]
+    (- ([pos? -> pos?] ([neg?]))))
+```
 ---
 
 But what about higher-orders? 
@@ -29,31 +168,23 @@ But what about higher-orders?
 (define (e2o f)
  (lambda (n) (- (f (+ n 1)) 1)))
 ```
-
+ 
 -- 
+
+> The key insight is that contracts delay higher-order checks and failures
+> always occur with a first order witness.
 
 Just keep the boundary checking inside the higher-order function.
 
 ---
 
-## Static checking
+```racket
+(e2o : (even? -> even?) -> (odd? -> odd?)
+(define (e2o f)
+ (lambda (n) (- (f (+ n 1)) 1)))
+```
 
-```
-(lambda ([pos? -> pos?]
-    (- ([pos? -> pos?] (- x))))
-```
-
-'x' must be negative, or the context is to blame.
-
-```
-(lambda ([pos? -> pos?]
-    (- ([pos? -> pos?] (- [neg?]))))
-```
-Fact: (- x) => [neg? -> pos?]
-```
-(lambda ([pos? -> pos?]
-    (- ([pos? -> pos?] ([neg?]))))
-```
+---
 
 # Deep and Shallow Embeddings
 
@@ -106,6 +237,7 @@ The expression problem.
 How do we get multiple interpretations for shallow embeddings?
 
 -- 
+
 ```haskell
 type Exp = (Int, String)
 
@@ -139,6 +271,7 @@ Lists as our running analogy:
     * Solution: Okasaki's bootstrapped data types.
 
 ---
+layout: false
 
 Observation: Monads often have this property (associativity changes
 performance). 
