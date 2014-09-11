@@ -427,7 +427,6 @@ interpret the data?
 template: multiple-interps
 
 ```haskell
-type Exp = Int
 
 lit n = \(f, _) -> f n
 add x y = \(_, s) -> s x y
