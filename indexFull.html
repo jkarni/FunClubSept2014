@@ -623,16 +623,14 @@ struct fooStruct
 
 setBaz :: Def ([Ref Global (Struct "fooStruct"), Sint16] :-> ())
 setBaz = proc "setBaz" $ \ ref val -> body (prgm ref val)
-
-prgm :: Ref Global (Struct "fooStruct") -> Sint16 -> Ivory eff ()
-prgm ref val = arrayMap $ \ ix -> store ((ref ~> baz) ! ix) val
+    where
+        prgm :: Ref Global (Struct "fooStruct") -> Sint16 -> Ivory eff ()
+        prgm ref val = arrayMap $ \ ix -> store ((ref ~> baz) ! ix) val
 ```
-
---
 
 ```haskell
 cmodule :: Module
-cmodule = package "foo_mod" $ do
+cmodule = package "foo_module" $ do
     defStruct (Proxy :: Proxy "fooStruct")
     incl setBaz
 
@@ -653,7 +651,6 @@ struct fooStruct {
 
 void setBaz(struct fooStruct* n_var0, int16_t n_var1);
 ```
---
 
 foo_source.c:
 ```c
@@ -716,14 +713,13 @@ setBaz = proc "setBaz" $ \ ref val _ -> body (prgm ref val)
 
 Guarantees:
 
-- Type-level array lengths!  (-:
 - Well-typed, well-scoped memory management
 - Well-typed C structs
 - Well-typed register / bit fields
+- Type-level array lengths!  (-:
 - No nullable pointers
 - No pointer arithmetic
-- No void pointer
-- No unsafe casts
+- No unsafe casts, no void pointer
 
 http://github.com/GaloisInc/ivory/blob/master/ivory/user-guide.md
 
@@ -732,7 +728,7 @@ http://github.com/GaloisInc/ivory/blob/master/ivory/user-guide.md
 
 ## Tower
 
-- Ivory extension
+- Ivory library
 - tasks (~ threads or processes)
 - communication channels
 - multiple backends (RTOSes, theorem provers, Graphviz)
@@ -745,7 +741,7 @@ http://github.com/GaloisInc/ivory/blob/master/ivory/user-guide.md
 ## Lessons Learned
 
 - SMACCMPilot is 23kloc Ivory, Tower (48kloc C compiled)
-- Still uses some ArduPilot code
+- (Still uses some ArduPilot C++ libraries.)
 --
 
 - Types are awesome
@@ -765,7 +761,7 @@ http://github.com/GaloisInc/ivory/blob/master/ivory/user-guide.md
 # Haste
 --
 
-## seamless web application programming
+## seamless, client-centric web application programming
 
 - write both server and client code in haskell
 - data types and application logic exist *only once*
@@ -792,8 +788,6 @@ app = do
         visitors <- onServer count
         alert ("Your are visitor #" ++ show visitors)
 ```
-
---
 
 ```haskell
 main :: IO ()
@@ -824,6 +818,13 @@ main = runApp (mkConfig "ws://localhost:1111" 1111) app
 
 ## The ICFP programming contest
 
+![Default-aligned image](fig4-lisp-assembler.png)
+
+
+---
+
+## The ICFP programming contest
+
 ![Default-aligned image](fig2-lambdaman.png)
 
 http://icfpcontest.org/
@@ -837,9 +838,9 @@ http://icfpcontest.org/game.html
 
 - links against ghclib
 - several new js-specific compiler phases
+- light-weight GHC runtime threads (`forkIO`)
 - template haskell runs on node.js!
 - in-browser, real-time profiling!
-- Efficient GHC runtime threads (`forkIO`)
 
 
 --
@@ -918,8 +919,8 @@ h$runSync(action, false);
 
 ## There is much more!
 
-- code: https://github.com/ghcjs/ghcjs
 - HIW talk: http://www.youtube.com/watch?v=pXBJc4e9KIE
+- code: https://github.com/ghcjs/ghcjs
 - blog article (June 2013): http://weblog.luite.com/wordpress/?p=14
 - blaze/react (brand new / alpha!): https://github.com/meiersi/blaze-react
 
