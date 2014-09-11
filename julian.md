@@ -209,9 +209,10 @@ template: higher-order
 (define (e2o f)
  (lambda (n) (- (f (+ n 1)) 1)))
 ```
- 
--- 
+  
+--
 
+ 
 > The key insight is that contracts delay higher-order checks and failures
 > always occur with a first order witness.
  
@@ -397,13 +398,13 @@ Deep and shallow embeddings as duals:
 The expression problem. 
 
 ---
-
-## Folds and Multiple interpretations
+name: multiple-interps
+## Multiple interpretations
 
 
 How do we get multiple interpretations for shallow embeddings?
 
--- 
+--
 
 ```haskell
 type Exp = (Int, String)
@@ -423,8 +424,54 @@ But what if we don't want to commit ahead of time to the ways in which we will
 interpret the data?
 
 ---
+template: multiple-interps
 
+```haskell
+type Exp = Int
+
+lit n = \(f, _) -> f n
+add x y = \(_, s) -> s x y
+
+evalSInt :: Exp -> Int
+evalSInt e = e (id, (+)) 
+
+evalSShow :: Exp -> Show
+evalSShow e = e (show, (++))
+```
+
+--
+
+Very easy to add more interpretations!
+
+--
+
+But note that it's gotten somewhat harder to add new constructs.
+
+---
+# Folds
+
+--
+
+There are a lot more cools things in the paper
+
+--
+
+Unified by the theme of treating shallow embeddings as folds.
+
+--
+
+- Banana Split Theorem
+
+--
+
+- Mutumorphisms
+
+
+---
+name: refl
 ## Reflection without Remorse
+
+--
 
 
 Lists as our running analogy:
@@ -438,27 +485,61 @@ Lists as our running analogy:
     * Solution: Okasaki's bootstrapped data types.
 
 ---
-layout: false
+template: refl
 
-Observation: Monads often have this property (associativity changes
+Observation - Monads often have this property (associativity changes
 performance). 
-- Example: Free Monads
+
+--
+
+- Example: Trees, Free Monads
+
+--
+
+Can we apply the same tricks to them?
+
+---
+
+template: refl
 
 ```haskell
-data Free f r = Free (f (Free f r)) | Pure r
-instance (Functor f) => Monad (Free f) where
-    return = Pure
-    (Free x) >>= f = Free (fmap (>>= f) x)
-    (Pure r) >>= f = f r
+data Tree a = Node (Tree a) (Tree a)
+            | Leaf a
+
+(<~) :: Tree a -> (a -> Tree b) -> Tree b
+Leaf x <~ f = f x
+Node l r <~ f = Node (l <~ f) (r <~ f)
+
+instance Monad Tree where
+    return = Leaf
+    (>>=) = (<~)
+```
+
+--
+```haskell
+(m >>= f) >>= g == m >>= (\x -> f x >>= g)
 ```
 --
-So
+Or more clearly:
+```haskell
+(>=>) :: (a -> m b) -> (b -> m c) -> (a -> m c)
+(f >=> g) >=> h == f >=> (g >=> h)
 ```
-x >>= f >>= g = g (f x)
-Free a >>= f >>= g = Free (fmap (>>= f) x) >>= g
-Free a >>= f >>= g = Free (fmap (>>= g) (fmap (>>= f) x)))
-Free a >>= (f . g) = Free (fmap (>>= f . g) x)
+
+---
+template: refl
+
+```haskell
+newtype Tree = Tree (CQueue TreeView)
+data TreeView = Node Tree Tree
+              | Leaf
+
+toView :: Tree -> TreeView
+
+fromView :: TreeView -> Tree
+fromView x = Tree $ singleton x
+
+(<~) :: Tree -> Tree -> Tree
+Tree l <~ Tree r = Tree (l `concat` r)
 ```
- 
-Can we apply the same tricks to them?
 
