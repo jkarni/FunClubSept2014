@@ -451,10 +451,9 @@ interpret the data?
 template: multiple-interps
 
 ```haskell
-type Exp = ...
 
 lit n = \(f, _) -> f n
-add x y = \(f, s) -> s x y
+add x y = \(_, s) -> s x y
 
 evalSInt :: Exp -> Int
 evalSInt e = e (id, (+)) 
